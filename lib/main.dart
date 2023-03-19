@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:vatsim_tracker/airports.dart' as airports;
 import 'package:vatsim_tracker/flight_list.dart';
+import 'package:vatsim_tracker/home_flight.dart';
 import 'package:vatsim_tracker/remote.dart';
 import 'dart:math' as math;
+
+const double myFlightHeight = 400;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,19 +43,29 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  static const double myFlightHeight = 400;
-  late final FlightList _list; // We'll have to change this on refresh
+  // We'll have to change these on refresh
+  late FlightList _list;
+  late HomeFlight _homeFlight;
+
   double _listScrollOffset = 0;
 
   @override
   void initState() {
     super.initState();
+    _homeFlight = HomeFlight(Remote.getRandomPilot());
 
-    _list = FlightList((offset) {
-      setState(() {
-        _listScrollOffset = offset;
-      });
-    });
+    _list = FlightList(
+      onOffsetUpdate: (offset) {
+        setState(() {
+          _listScrollOffset = offset;
+        });
+      },
+      onFlightClick: (pilot) {
+        setState(() {
+          _homeFlight = HomeFlight(pilot);
+        });
+      },
+    );
   }
 
   @override
@@ -80,11 +93,9 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            const SizedBox(
+            SizedBox(
               height: myFlightHeight,
-              child: Center(
-                child: Text("hello"),
-              ),
+              child: _homeFlight,
             ),
             Positioned(
               top: myFlightHeight,

@@ -2,6 +2,9 @@ import 'package:vatsim_tracker/flight_plan.dart';
 import 'package:vatsim_tracker/pilot.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
+import "dart:math" as math;
+
+final _random = math.Random();
 
 class Remote {
   static late List<Pilot> _pilots;
@@ -71,9 +74,18 @@ class Remote {
         lastUpdated: lastUpdated,
       ));
     }
+
+    _pilots.sort((p1, p2) => p1.cid - p2.cid);
   }
 
   static List<Pilot> getPilots() {
     return _pilots;
+  }
+
+  static Pilot getRandomPilot() {
+    if (_pilots.isEmpty) {
+      throw Exception("Can not get pilot before fetching data from server.");
+    }
+    return _pilots[_random.nextInt(_pilots.length)];
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vatsim_tracker/airports.dart' as airports;
 import 'dart:math' as math;
-import 'flight_plan.dart' show FlightPlan, calculateDistance;
+import 'flight_plan.dart';
 
 import 'package:vatsim_tracker/pilot.dart';
 
@@ -15,9 +15,10 @@ String setMaxLen(String str, int len) {
 }
 
 class Flight extends StatelessWidget {
-  const Flight(this.pilot, {super.key});
-
   final Pilot pilot;
+  final void Function(Pilot) onClick;
+
+  const Flight({required this.pilot, required this.onClick, super.key});
 
   final TextStyle flightStyle = const TextStyle(
     fontSize: 34,
@@ -63,7 +64,7 @@ class Flight extends StatelessWidget {
     if (pilot.flightPlan != null) {
       return GestureDetector(
         onTap: () {
-          print("${pilot.latitude}, ${pilot.longitude}");
+          onClick(pilot);
         },
         child: Container(
           decoration: BoxDecoration(

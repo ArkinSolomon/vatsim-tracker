@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:vatsim_tracker/pilot.dart';
 import 'package:vatsim_tracker/remote.dart';
 
 import 'flight.dart';
 
 class FlightList extends StatefulWidget {
   final void Function(double) onOffsetUpdate;
+  final void Function(Pilot) onFlightClick;
 
-  const FlightList(this.onOffsetUpdate, {super.key});
-
-  void _offsetUpdated(double offset) {
-    onOffsetUpdate(offset);
-  }
+  const FlightList(
+      {required this.onOffsetUpdate, required this.onFlightClick, super.key});
 
   @override
   State<FlightList> createState() => _FlightListState();
@@ -26,7 +25,7 @@ class _FlightListState extends State<FlightList> {
     super.initState();
     _scrollController = ScrollController();
     _scrollController
-        .addListener(() => widget._offsetUpdated(_scrollController.offset));
+        .addListener(() => widget.onOffsetUpdate(_scrollController.offset));
 
     Remote.updateData().then((value) {
       _regenerateChildren();
@@ -66,7 +65,10 @@ class _FlightListState extends State<FlightList> {
         continue; // TODO: Handle VFR
       }
 
-      _flightChildren.add(Flight(pilot));
+      _flightChildren.add(Flight(
+        pilot: pilot,
+        onClick: widget.onFlightClick,
+      ));
 
       _flightChildren.add(SizedBox.fromSize(
         size: const Size.fromHeight(30),

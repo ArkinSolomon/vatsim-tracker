@@ -38,6 +38,7 @@ dependencies:
   http: ^0.13.5
   shared_preferences: 
   csv: ^5.0.1
+  flutter_svg: ^2.0.4
 
 dev_dependencies:
   flutter_test:
@@ -80,4 +81,4 @@ flutter:
           style: italic
   
   assets: 
-   - assets/airports.csv
+   - assets/
