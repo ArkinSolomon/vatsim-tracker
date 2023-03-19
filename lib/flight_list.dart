@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:vatsim_tracker/main.dart';
 import 'package:vatsim_tracker/remote.dart';
 
 import 'flight.dart';
@@ -63,7 +62,10 @@ class _FlightListState extends State<FlightList> {
     var pilots = Remote.getPilots();
 
     for (final pilot in pilots) {
-      if (pilot.flightPlan == null) continue;
+      if (pilot.flightPlan == null) {
+        continue; // TODO: Handle VFR
+      }
+
       _flightChildren.add(Flight(pilot));
 
       _flightChildren.add(SizedBox.fromSize(

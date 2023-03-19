@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:vatsim_tracker/flight.dart';
+import 'package:vatsim_tracker/airports.dart' as airports;
 import 'package:vatsim_tracker/flight_list.dart';
 import 'package:vatsim_tracker/remote.dart';
 import 'dart:math' as math;
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Remote.updateData();
+  await airports.loadAirports();
   runApp(const VatsimTracker());
 }
 

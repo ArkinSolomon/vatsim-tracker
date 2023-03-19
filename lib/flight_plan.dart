@@ -1,3 +1,20 @@
+import 'dart:math' as math;
+import 'package:vatsim_tracker/airport.dart';
+
+import 'airports.dart' as airports;
+
+// https://stackoverflow.com/questions/54138750/total-distance-calculation-from-latlng-list
+double calculateDistance(lat1, lon1, lat2, lon2) {
+  var p = math.pi / 180;
+  var a = 0.5 -
+      math.cos((lat2 - lat1) * p) / 2 +
+      math.cos(lat1 * p) *
+          math.cos(lat2 * p) *
+          (1 - math.cos((lon2 - lon1) * p)) /
+          2;
+  return 12742 * math.asin(math.sqrt(a)) / 1.852;
+}
+
 class FlightPlan {
   const FlightPlan({
     required this.flightRules,
@@ -34,6 +51,21 @@ class FlightPlan {
   final String route;
   final int revisionId;
   final String assignedTransponder;
+
+  double getDistance() {
+    Airport? departureAirport = airports.getAirport(departure);
+    Airport? arrivalAirport = airports.getAirport(arrival);
+    if (departureAirport == null || arrivalAirport == null) {
+      return -1;
+    }
+
+    return calculateDistance(
+      departureAirport.latitude,
+      departureAirport.longitude,
+      arrivalAirport.latitude,
+      arrivalAirport.longitude,
+    );
+  }
 }
 
 enum FlightRules { instrument, visual }
