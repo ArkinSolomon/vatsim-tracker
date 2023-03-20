@@ -86,17 +86,17 @@ class _HomePageState extends State<HomePage> {
           children: [
             Container(
               alignment: Alignment.bottomCenter,
-              child: ClipRect(
-                child: SizedBox(
-                  height: MediaQuery.of(context).size.height - myFlightHeight,
-                  child: _list,
-                ),
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height - myFlightHeight,
+                child: _list,
               ),
             ),
             SizedBox(
               height: myFlightHeight,
               child: _homeFlight,
             ),
+
+            // The shadow that appears after yous tart scrolling
             Positioned(
               top: myFlightHeight,
               child: ClipRect(
@@ -104,7 +104,15 @@ class _HomePageState extends State<HomePage> {
                   angle: math.pi,
                   child: Container(
                     width: MediaQuery.of(context).size.width,
-                    height: lerp(0, 30, _listScrollOffset / 30),
+                    height: lerp(
+                        0,
+                        30,
+
+                        // Get the absolute value of the offset
+                        (_listScrollOffset < 0
+                                ? _listScrollOffset * -1
+                                : _listScrollOffset) /
+                            30),
                     decoration: const BoxDecoration(
                       boxShadow: [
                         BoxShadow(

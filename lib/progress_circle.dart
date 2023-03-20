@@ -52,7 +52,8 @@ class ProgressCircle extends StatelessWidget {
               child: Image(
                 height: _flightIconSize,
                 width: _flightIconSize,
-                image: const AssetImage("assets/progress_aircraft.png"),
+                image: const AssetImage(
+                    "assets/placeholder_progress_aircraft.png"),
               ),
             ),
           )

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vatsim_tracker/pilot.dart';
 import 'package:vatsim_tracker/remote.dart';
+import 'dart:math' as math;
 
 import 'flight.dart';
 
@@ -16,17 +17,26 @@ class FlightList extends StatefulWidget {
 }
 
 class _FlightListState extends State<FlightList> {
+  static const double resetOffset = -40;
+
+  late ScrollController _scrollController;
+
   bool _isLoading = true;
   List<Widget> _flightChildren = [];
-  late final ScrollController _scrollController;
+
+  ScrollUpdateNotification? _lastNotification;
+  double _lastOffset = 0;
+
+  void _createScrollController() {
+    _scrollController = ScrollController();
+    _scrollController
+        .addListener(() => widget.onOffsetUpdate(_scrollController.offset));
+  }
 
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
-    _scrollController
-        .addListener(() => widget.onOffsetUpdate(_scrollController.offset));
-
+    _createScrollController();
     Remote.updateData().then((value) {
       _regenerateChildren();
       if (mounted) {
@@ -47,8 +57,15 @@ class _FlightListState extends State<FlightList> {
 
   Future<void> _updateFlights() async {
     setState(() {
+      _lastNotification = null;
+      _lastOffset = 0;
       _isLoading = true;
     });
+
+    _scrollController.dispose();
+    _createScrollController();
+    widget.onOffsetUpdate(0);
+
     await Remote.updateData();
     setState(() {
       _regenerateChildren();
@@ -82,16 +99,71 @@ class _FlightListState extends State<FlightList> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Center(child: Text("Loading..."));
-    } else {
-      return SingleChildScrollView(
-        controller: _scrollController,
-        clipBehavior: Clip.none,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Column(
-            children: _flightChildren,
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Text(
+            "Fetching latest data from vatsim servers",
+            style: TextStyle(color: Colors.white),
           ),
+          Image(
+            height: 128,
+            width: 128,
+            image: AssetImage("assets/placeholder_loading.gif"),
+          )
+        ],
+      );
+    } else {
+      return NotificationListener(
+        onNotification: (notification) {
+          if (notification is ScrollUpdateNotification) {
+            if (_lastNotification != null &&
+                _lastNotification!.dragDetails != null &&
+                notification.dragDetails == null &&
+                _lastOffset < resetOffset) {
+              _updateFlights();
+              return false;
+            }
+
+            _lastNotification = notification;
+            setState(() {
+              _lastOffset = _scrollController.offset;
+            });
+            return false;
+          }
+          return true;
+        },
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Positioned(
+              top: -30 -
+                  ((double x) => x > -80 ? x : -math.pow(-x - 80, 5 / 6) - 80)(
+                          _lastOffset) *
+                      1.2,
+              child: Text(
+                (() {
+                  return _lastOffset < resetOffset
+                      ? "Release to refresh"
+                      : "Pull to refresh";
+                })(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+            SingleChildScrollView(
+              controller: _scrollController,
+              clipBehavior: Clip.hardEdge,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Column(
+                  children: _flightChildren,
+                ),
+              ),
+            )
+          ],
         ),
       );
     }
