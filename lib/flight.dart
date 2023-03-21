@@ -5,6 +5,11 @@ import 'flight_plan.dart';
 
 import 'package:vatsim_tracker/pilot.dart';
 
+/// Add "..." to the end of a string if its too long.
+///
+/// If the length of [str] is less than or equal to [len], str is returned
+/// without change. Otherwise, str is cut to be exactly [len] characters long,
+/// including the ellipsis at the end.
 String setMaxLen(String str, int len) {
   if (str.length <= len) {
     return str;
@@ -14,26 +19,29 @@ String setMaxLen(String str, int len) {
   return "$str...";
 }
 
+/// Create a general view for a single pilot's flightplan.
 class Flight extends StatelessWidget {
   final Pilot pilot;
   final void Function(Pilot) onClick;
 
   const Flight({required this.pilot, required this.onClick, super.key});
 
-  final TextStyle flightStyle = const TextStyle(
+  static const TextStyle flightStyle = TextStyle(
     fontSize: 34,
     fontWeight: FontWeight.bold,
     color: Colors.white,
     fontFamily: "AzeretMono",
   );
 
-  final TextStyle dataStyle = const TextStyle(
+  static const TextStyle dataStyle = TextStyle(
     fontSize: 12,
     color: Colors.white,
     fontFamily: "AzeretMono",
   );
 
-  String getDistanceText() {
+  /// Get the text which should be displayed at the bottom of this widget,
+  /// dependent on the flight plan of the pilot.
+  String _getDistanceText() {
     FlightPlan? plan = pilot.flightPlan;
 
     if (plan == null || plan.arrival == "NONE" || plan.arrival.isEmpty) {
@@ -197,7 +205,7 @@ class Flight extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 10),
                   child: Align(
                     child: Text(
-                      getDistanceText(),
+                      _getDistanceText(),
                       style: dataStyle,
                     ),
                   ),

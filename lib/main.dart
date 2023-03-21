@@ -5,8 +5,10 @@ import 'package:vatsim_tracker/home_flight.dart';
 import 'package:vatsim_tracker/remote.dart';
 import 'dart:math' as math;
 
+/// The height of the widget displayed at the top of the home page.
 const double myFlightHeight = 400;
 
+/// Initialization code.
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Remote.updateData();
@@ -14,36 +16,36 @@ void main() async {
   runApp(const VatsimTracker());
 }
 
+/// Linearly interpolate between [a] and [b], at [f].
+///
+/// [f] will be clamped between zero and one.
 double lerp(double a, double b, double f) {
   f = f.clamp(0, 1);
   return a * (1.0 - f) + (b * f);
 }
 
+/// Main app widget.
 class VatsimTracker extends StatelessWidget {
   const VatsimTracker({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'Vatsim Tracker',
-      theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
-      ),
-      home: const HomePage(title: 'Vatsim Tracker'),
+      home: HomePage(),
     );
   }
 }
 
+/// The homepage of the application.
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
-  final String title;
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  // We'll have to change these on refresh
   late FlightList _list;
   late HomeFlight _homeFlight;
 
@@ -52,7 +54,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _homeFlight = HomeFlight(Remote.getRandomPilot());
+    _homeFlight = HomeFlight(pilot: Remote.getRandomPilot());
 
     _list = FlightList(
       onOffsetUpdate: (offset) {
@@ -62,7 +64,7 @@ class _HomePageState extends State<HomePage> {
       },
       onFlightClick: (pilot) {
         setState(() {
-          _homeFlight = HomeFlight(pilot);
+          _homeFlight = HomeFlight(pilot: pilot);
         });
       },
     );

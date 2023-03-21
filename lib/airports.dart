@@ -2,8 +2,10 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'airport.dart';
 import 'package:csv/csv.dart';
 
+/// All airports referenced by its identifier (which is usually its ICAO code).
 Map<String, Airport> airports = {};
 
+/// Load the airports from the `assets/airports.csv` file into [airports].
 Future<void> loadAirports() async {
   final csvStr = await rootBundle.loadString('assets/airports.csv');
   final data = const CsvToListConverter(eol: "\n", shouldParseNumbers: false)
@@ -29,6 +31,10 @@ Future<void> loadAirports() async {
   }
 }
 
-Airport? getAirport(String icao) {
-  return airports[icao];
+/// Get an airport by its identifier.
+///
+/// Returns null if the airport is not found. Note that [ident] (most of the
+/// time) is the ICAO code.
+Airport? getAirport(String ident) {
+  return airports[ident];
 }

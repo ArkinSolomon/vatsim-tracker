@@ -1,3 +1,7 @@
+import 'package:flutter/material.dart';
+
+/// A single airport as read in from the `assets/airports.csv` file.
+@immutable
 class Airport {
   final String ident;
   final String type;
@@ -13,7 +17,7 @@ class Airport {
   final String? iata;
   final String? local;
 
-  Airport(
+  const Airport(
     this.ident,
     this.type,
     this.name,

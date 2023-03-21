@@ -4,16 +4,30 @@ import 'package:vatsim_tracker/flight_plan.dart'
 
 import 'airport.dart';
 
+/// The current status of a flight
 enum FlightStatus {
-  preflight, // IFR, pre-takeoff
-  enroute, // IFR, in-flight
-  arrived, // IFR, after-landing
-  flying, // VFR, in-flight
-  landed, // VFR, on-ground
+  /// IFR flights, pre-takeoff
+  preflight, //
+
+  /// IFR flights, in-flight
+  enroute,
+
+  /// IFR flights, after-landing
+  arrived,
+
+  /// VFR flights, in-flight
+  flying,
+
+  /// VFR flights, on the ground
+  landed,
+
+  /// Anything else, shouldn't really happen though
   unknown,
 }
 
 extension FlightStatusString on FlightStatus {
+  /// Get the human readable version of the enumeration, with proper
+  /// capitalization.
   String get readable {
     switch (this) {
       case FlightStatus.preflight:
@@ -32,6 +46,7 @@ extension FlightStatusString on FlightStatus {
   }
 }
 
+/// A single pilot currently connected to the network.
 class Pilot {
   const Pilot({
     required this.cid,
@@ -69,6 +84,11 @@ class Pilot {
   final DateTime logonTime;
   final DateTime lastUpdated;
 
+  /// Get the distance from the pilots current position to the position at
+  /// [latitude], [longitude] in nautical miles.
+  ///
+  /// This method uses the Haversine method, and takes advantage of the
+  /// [calculateDistance] function.
   double getDistanceTo(double latitude, double longitude) {
     return calculateDistance(
       this.latitude,
@@ -78,10 +98,16 @@ class Pilot {
     );
   }
 
+  /// Calculate the distance from this pilot to the coordinates of the Airport
+  /// [airport].
+  ///
+  /// This method takes advantage of the [getDistanceTo] method.
   double getDistanceToAirport(Airport airport) {
     return getDistanceTo(airport.latitude, airport.longitude);
   }
 
+  /// The current status of the pilot, depending on their ground speed,
+  /// flight plan type, and distance to the arrival and departure airports.
   FlightStatus get status {
     final departure = airports.getAirport(flightPlan!.departure);
     final arrival = airports.getAirport(flightPlan!.arrival);

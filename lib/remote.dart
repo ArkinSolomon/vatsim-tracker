@@ -6,15 +6,24 @@ import "dart:math" as math;
 
 final _random = math.Random();
 
+/// This retrieves, parses, and stores data from the Vatsim network, and stores
+/// it staticly.
 class Remote {
-  static late List<Pilot> _pilots;
+  /// All of the pilots indexed by their CID.
+  static late Map<int, Pilot> _pilots;
 
+  /// Update the currently data from the Vatsim network.
+  ///
+  /// This function must be called before attempting to retrieve any data from
+  /// other methods or properties of this class, otherwise an exception will be
+  /// thrown, or the data will be empty. This method should also be called
+  /// periodically to get the most up to date information.
   static Future<void> updateData() async {
     final fetchUri = Uri.parse("https://data.vatsim.net/v3/vatsim-data.json");
     final response = await http.get(fetchUri);
 
     if (response.statusCode != 200) {
-      print('Could not retrieve data');
+      print("Could not retrieve data from the vatsim network");
       return;
     }
 
@@ -22,7 +31,7 @@ class Remote {
         convert.jsonDecode(response.body) as Map<String, dynamic>;
 
     final allPilots = List<Map<String, dynamic>>.from(parsedData["pilots"]);
-    _pilots = [];
+    _pilots = {};
 
     for (final pilotData in allPilots) {
       final flightPlanData = pilotData["flight_plan"] as Map<String, dynamic>?;
@@ -51,12 +60,14 @@ class Remote {
         );
       }
 
-      var logonTime = DateTime.tryParse(pilotData["logon_time"]) ?? DateTime(0);
-      var lastUpdated =
+      final logonTime =
+          DateTime.tryParse(pilotData["logon_time"]) ?? DateTime(0);
+      final lastUpdated =
           DateTime.tryParse(pilotData["last_updated"]) ?? DateTime(0);
 
-      _pilots.add(Pilot(
-        cid: pilotData["cid"],
+      final int cid = pilotData["cid"];
+      _pilots[cid] = Pilot(
+        cid: cid,
         name: pilotData["name"],
         callsign: pilotData["callsign"],
         server: pilotData["server"],
@@ -72,20 +83,18 @@ class Remote {
         flightPlan: flightPlan,
         logonTime: logonTime,
         lastUpdated: lastUpdated,
-      ));
+      );
     }
-
-    _pilots.sort((p1, p2) => p1.cid - p2.cid);
   }
 
-  static List<Pilot> getPilots() {
-    return _pilots;
+  static List<Pilot> get pilots {
+    return _pilots.values.toList();
   }
 
   static Pilot getRandomPilot() {
     if (_pilots.isEmpty) {
       throw Exception("Can not get pilot before fetching data from server.");
     }
-    return _pilots[_random.nextInt(_pilots.length)];
+    return _pilots[_pilots.keys.toList()[_random.nextInt(_pilots.length)]]!;
   }
 }

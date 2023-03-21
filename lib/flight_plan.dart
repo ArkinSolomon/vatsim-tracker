@@ -1,9 +1,15 @@
 import 'dart:math' as math;
+import 'package:flutter/material.dart';
 import 'package:vatsim_tracker/airport.dart';
 
 import 'airports.dart' as airports;
 
-// https://stackoverflow.com/questions/54138750/total-distance-calculation-from-latlng-list
+/// Calculate the distance between two points on the globe using the Haversine
+/// method.
+///
+/// The value returned is in nautical miles.
+///
+/// Also see https://stackoverflow.com/questions/54138750/total-distance-calculation-from-latlng-list
 double calculateDistance(lat1, lon1, lat2, lon2) {
   var p = math.pi / 180;
   var a = 0.5 -
@@ -15,6 +21,8 @@ double calculateDistance(lat1, lon1, lat2, lon2) {
   return 12742 * math.asin(math.sqrt(a)) / 1.852;
 }
 
+/// A single flightplan for IFR flight.
+@immutable
 class FlightPlan {
   const FlightPlan({
     required this.flightRules,
@@ -52,6 +60,9 @@ class FlightPlan {
   final int revisionId;
   final String assignedTransponder;
 
+  /// Get the total distance between the departure and arrival airports.
+  ///
+  /// `-1` is returned if the departure or arrival airport is not found.
   double getDistance() {
     Airport? departureAirport = airports.getAirport(departure);
     Airport? arrivalAirport = airports.getAirport(arrival);
