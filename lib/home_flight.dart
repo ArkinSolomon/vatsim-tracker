@@ -2,18 +2,22 @@ import 'airports.dart' as airports;
 import 'package:flutter/material.dart';
 import 'package:vatsim_tracker/progress_circle.dart';
 import 'pilot.dart';
+import 'flight.dart' show setMaxLen;
 
 /// The widget displayed on the top of the homepage.
 class HomeFlight extends StatelessWidget {
   final Pilot pilot;
-  final double _topPadding = 50;
-  final double _horizPadding = 50;
 
   static const TextStyle airportTextStyle = TextStyle(
+    color: Colors.black,
+    fontFamily: "AzeretMono",
+    fontSize: 35,
+    fontWeight: FontWeight.bold,
+  );
+
+  static const TextStyle headDataTextStyle = TextStyle(
     color: Colors.white,
     fontFamily: "AzeretMono",
-    fontSize: 25,
-    fontWeight: FontWeight.bold,
   );
 
   /// Display the fligth status for [pilot].
@@ -33,24 +37,55 @@ class HomeFlight extends StatelessWidget {
       if (totalDistance < 0) {
         progress = 0.5;
       } else {
-        final distanceTraveled = progress = pilot
+        final distanceTraveled = pilot
             .getDistanceToAirport(airports.getAirport(flightPlan.departure)!);
-        progress = distanceTraveled / totalDistance;
+
+        if (distanceTraveled > totalDistance * 1.15 ||
+            pilot.status == FlightStatus.unknown) {
+          progress = 0.5;
+        } else {
+          progress = distanceTraveled / totalDistance;
+        }
       }
     }
 
     return Container(
-      padding: EdgeInsets.only(top: _topPadding),
+      padding: const EdgeInsets.only(top: 65),
       child: Stack(
         children: [
           ProgressCircle(
             progress: progress,
-            topPadding: _topPadding,
-            horizPadding: _horizPadding,
+            padding: 100,
+          ),
+          Align(
+            alignment: Alignment.topCenter,
+            child: Container(
+              padding: const EdgeInsets.only(top: 34),
+              child: Column(
+                children: [
+                  Text(pilot.callsign, style: headDataTextStyle),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(flightPlan.aircraftShort,
+                        style: headDataTextStyle),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text("Status: ${pilot.status.readable}",
+                        style: headDataTextStyle),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(setMaxLen(pilot.name, 24),
+                        style: headDataTextStyle),
+                  )
+                ],
+              ),
+            ),
           ),
           Center(
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: _horizPadding),
+              padding: const EdgeInsets.only(left: 20, right: 20, top: 34),
               child: Row(
                 children: [
                   Expanded(
@@ -74,6 +109,10 @@ class HomeFlight extends StatelessWidget {
                 ],
               ),
             ),
+          ),
+          Container(
+            decoration:
+                BoxDecoration(border: Border.all(color: Colors.pink, width: 1)),
           )
         ],
       ),

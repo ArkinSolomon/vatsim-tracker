@@ -12,6 +12,11 @@ class Remote {
   /// All of the pilots indexed by their CID.
   static late Map<int, Pilot> _pilots;
 
+  static final Set<void Function()> _updateListeners = {};
+
+  static void addUpdateListener = _updateListeners.add;
+  static void removeUpdateListener = _updateListeners.remove;
+
   /// Update the currently data from the Vatsim network.
   ///
   /// This function must be called before attempting to retrieve any data from
@@ -85,16 +90,51 @@ class Remote {
         lastUpdated: lastUpdated,
       );
     }
+
+    _notifyListeners();
   }
 
+  /// Get a list of all of the pilots connected to the network.
   static List<Pilot> get pilots {
     return _pilots.values.toList();
   }
 
+  /// Get a pilot by their [cid].
+  ///
+  /// An exception is thrown if we do not have data on the pilot with the CID
+  /// [cid].
+  static Pilot getPilot(int cid) {
+    final pilot = _pilots[cid];
+
+    if (pilot == null) {
+      throw Exception("No pilot with CID $cid found on remote");
+    }
+
+    return pilot;
+  }
+
+  /// Get a random pilot connected to the network.
+  ///
+  /// An exception is thrown in the pilot list is empty.
   static Pilot getRandomPilot() {
     if (_pilots.isEmpty) {
       throw Exception("Can not get pilot before fetching data from server.");
     }
     return _pilots[_pilots.keys.toList()[_random.nextInt(_pilots.length)]]!;
+  }
+
+  /// Check if the pilot with the CID [cid] is currently connected to the
+  /// network.
+  ///
+  /// Returns true if the pilot is connected, or false otherwise.
+  static bool hasPilot(int cid) {
+    return _pilots.containsKey(cid);
+  }
+
+  /// Notify all update listners that the data has been updated.
+  static _notifyListeners() {
+    for (final callback in _updateListeners) {
+      callback();
+    }
   }
 }

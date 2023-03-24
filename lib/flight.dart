@@ -24,14 +24,16 @@ class Flight extends StatelessWidget {
   final Pilot pilot;
   final void Function(Pilot) onClick;
 
-  const Flight({required this.pilot, required this.onClick, super.key});
-
   static const TextStyle flightStyle = TextStyle(
     fontSize: 34,
     fontWeight: FontWeight.bold,
     color: Colors.white,
     fontFamily: "AzeretMono",
   );
+
+  static const double _borderRadius = 20;
+
+  const Flight({required this.pilot, required this.onClick, super.key});
 
   static const TextStyle dataStyle = TextStyle(
     fontSize: 12,
@@ -74,143 +76,155 @@ class Flight extends StatelessWidget {
         onTap: () {
           onClick(pilot);
         },
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: const Color.fromRGBO(235, 222, 239, 1),
+        child: Card(
+          elevation: 12,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(_borderRadius)),
+          child: ClipPath(
+            clipper: ShapeBorderClipper(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(_borderRadius),
+              ),
             ),
-            color: Colors.black,
-          ),
-          child: SizedBox(
-            width: double.infinity,
-            height: 160,
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Center(
-                            child: Text(
-                              pilot.flightPlan?.departure as String,
-                              style: flightStyle,
+            child: Container(
+              clipBehavior: Clip.none,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(_borderRadius),
+                border: Border.all(color: Colors.white, width: 2),
+                color: Colors.black,
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                height: 160,
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Center(
+                                child: Text(
+                                  pilot.flightPlan?.departure as String,
+                                  style: flightStyle,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                      Transform.rotate(
-                        angle: math.pi / 2,
-                        child: const Icon(
-                          Icons.airplanemode_active_rounded,
-                          color: Color.fromARGB(255, 193, 193, 193),
-                          size: 32,
-                        ),
-                      ),
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Center(
-                            child: Text(
-                              pilot.flightPlan?.arrival as String,
-                              style: flightStyle,
+                          Transform.rotate(
+                            angle: math.pi / 2,
+                            child: const Icon(
+                              Icons.airplanemode_active_rounded,
+                              color: Color.fromARGB(255, 193, 193, 193),
+                              size: 32,
                             ),
                           ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-                  child: Row(
-                    children: [
-                      Text(
-                        pilot.callsign,
-                        style: dataStyle,
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Center(
+                                child: Text(
+                                  pilot.flightPlan?.arrival as String,
+                                  style: flightStyle,
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
                       ),
-                      Flexible(
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            "Status: ${pilot.status.readable}",
-                            style: dataStyle,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        pilot.flightPlan!.aircraftShort,
-                        style: dataStyle,
-                      )
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    children: [
-                      Text(
-                        setMaxLen(pilot.name.trim(), 25).trim(),
-                        style: dataStyle,
-                      ),
-                      Flexible(
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            "CID: ${pilot.cid}",
-                            style: dataStyle,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Row(
-                    children: [
-                      Flexible(
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Alt: ${pilot.altitude}ft",
-                            style: dataStyle,
-                          ),
-                        ),
-                      ),
-                      Flexible(
-                        child: Align(
-                          child: Text(
-                            "HDG: ${pilot.heading}°",
-                            style: dataStyle,
-                          ),
-                        ),
-                      ),
-                      Flexible(
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            "GS: ${pilot.groundspeed}kts",
-                            style: dataStyle,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Align(
-                    child: Text(
-                      _getDistanceText(),
-                      style: dataStyle,
                     ),
-                  ),
-                )
-              ],
+                    Container(
+                      padding:
+                          const EdgeInsets.only(top: 10, left: 10, right: 10),
+                      child: Row(
+                        children: [
+                          Text(
+                            pilot.callsign,
+                            style: dataStyle,
+                          ),
+                          Flexible(
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                "Status: ${pilot.status.readable}",
+                                style: dataStyle,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            pilot.flightPlan!.aircraftShort,
+                            style: dataStyle,
+                          )
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      child: Row(
+                        children: [
+                          Text(
+                            setMaxLen(pilot.name.trim(), 25).trim(),
+                            style: dataStyle,
+                          ),
+                          Flexible(
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                "CID: ${pilot.cid}",
+                                style: dataStyle,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Row(
+                        children: [
+                          Flexible(
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                "Alt: ${pilot.altitude}ft",
+                                style: dataStyle,
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            child: Align(
+                              child: Text(
+                                "HDG: ${pilot.heading}°",
+                                style: dataStyle,
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                "GS: ${pilot.groundspeed}kts",
+                                style: dataStyle,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Align(
+                        child: Text(
+                          _getDistanceText(),
+                          style: dataStyle,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
             ),
           ),
         ),

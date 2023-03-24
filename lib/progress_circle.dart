@@ -1,20 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'main.dart' show myFlightHeight, lerp;
+import 'main.dart' show myFlightHeight;
+import 'math_utils.dart' show lerp;
 import 'dart:math' as math;
 
 /// The circle and airplane used to show progress for a flight.
 ///
 /// Note that this widget is currently only designed to work with [HomeFlight].
 class ProgressCircle extends StatelessWidget {
-  /// The padding at the top of the wrapping widget.
-  final double topPadding;
-
-  /// The padding at the left and right of the widget.
-  ///
-  /// This assumes that the left and right of the widget has symmetrical
-  /// padding.
-  final double horizPadding;
+  final double padding;
   final double _progress;
   final Widget _circleSvg = SvgPicture.asset("assets/progress_circle.svg");
 
@@ -33,19 +27,18 @@ class ProgressCircle extends StatelessWidget {
   /// to such bounds.
   ProgressCircle({
     required double progress,
-    required this.topPadding,
-    required this.horizPadding,
+    required this.padding,
     super.key,
   }) : _progress = progress.clamp(0, 1);
 
   @override
   Widget build(BuildContext context) {
-    final usableHeight = myFlightHeight - topPadding;
-    final usableWidth = MediaQuery.of(context).size.width - horizPadding * 2;
+    final usableHeight = myFlightHeight - padding;
+    final usableWidth = MediaQuery.of(context).size.width - padding * 2;
 
     final angle = lerp(0, math.pi, _progress);
     final centerY = usableHeight / 2 - _flightIconSize / 2;
-    final centerX = horizPadding + usableWidth / 2 - _flightIconSize / 2;
+    final centerX = padding + usableWidth / 2 - _flightIconSize / 2;
     final radius = usableHeight / 2 - _progressCircleThickness / 2;
 
     final planeTop = centerY - radius * math.sin(angle);
@@ -57,7 +50,7 @@ class ProgressCircle extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           ClipRect(
-            clipper: _ProgressCircleClipper(topPadding),
+            clipper: _ProgressCircleClipper(padding),
             child: Transform.rotate(
               angle: angle + 0.005,
               child: _circleSvg,

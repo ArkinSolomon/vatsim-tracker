@@ -4,6 +4,7 @@ import 'package:vatsim_tracker/flight_list.dart';
 import 'package:vatsim_tracker/home_flight.dart';
 import 'package:vatsim_tracker/remote.dart';
 import 'dart:math' as math;
+import 'math_utils.dart' show lerp;
 
 /// The height of the widget displayed at the top of the home page.
 const double myFlightHeight = 400;
@@ -14,14 +15,6 @@ void main() async {
   await Remote.updateData();
   await airports.loadAirports();
   runApp(const VatsimTracker());
-}
-
-/// Linearly interpolate between [a] and [b], at [f].
-///
-/// [f] will be clamped between zero and one.
-double lerp(double a, double b, double f) {
-  f = f.clamp(0, 1);
-  return a * (1.0 - f) + (b * f);
 }
 
 /// Main app widget.
@@ -54,7 +47,12 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _homeFlight = HomeFlight(pilot: Remote.getRandomPilot());
+
+    const int myCID = 1404350;
+    _homeFlight = HomeFlight(
+        pilot: Remote.hasPilot(myCID)
+            ? Remote.getPilot(myCID)
+            : Remote.getRandomPilot());
 
     _list = FlightList(
       onOffsetUpdate: (offset) {
@@ -76,9 +74,11 @@ class _HomePageState extends State<HomePage> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
+            begin: Alignment(-0.3, -0.2),
+            end: Alignment(0, 0.4),
             colors: [
               Color.fromARGB(255, 74, 7, 61),
-              Color.fromARGB(255, 44, 15, 93),
+              Color.fromARGB(255, 54, 15, 83),
               Colors.black,
             ],
             transform: GradientRotation(math.pi / 2),
@@ -86,6 +86,22 @@ class _HomePageState extends State<HomePage> {
         ),
         child: Stack(
           children: [
+            Column(
+              children: [
+                Expanded(child: Container()),
+                Container(
+                  alignment: Alignment.bottomCenter,
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(35)),
+                  ),
+                  height: MediaQuery.of(context).size.height -
+                      myFlightHeight * (43 / 90),
+                ),
+              ],
+            ),
             Container(
               alignment: Alignment.bottomCenter,
               child: SizedBox(
@@ -109,7 +125,6 @@ class _HomePageState extends State<HomePage> {
                     height: lerp(
                         0,
                         30,
-
                         // Get the absolute value of the offset
                         (_listScrollOffset < 0
                                 ? _listScrollOffset * -1
