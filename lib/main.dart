@@ -4,7 +4,7 @@ import 'package:vatsim_tracker/flight_list.dart';
 import 'package:vatsim_tracker/home_flight.dart';
 import 'package:vatsim_tracker/remote.dart';
 import 'dart:math' as math;
-import 'math_utils.dart' show lerp;
+import 'math_utils.dart' show abs, lerp;
 
 /// The height of the widget displayed at the top of the home page.
 const double myFlightHeight = 400;
@@ -126,10 +126,7 @@ class _HomePageState extends State<HomePage> {
                         0,
                         30,
                         // Get the absolute value of the offset
-                        (_listScrollOffset < 0
-                                ? _listScrollOffset * -1
-                                : _listScrollOffset) /
-                            30),
+                        abs(_listScrollOffset) / 30),
                     decoration: const BoxDecoration(
                       boxShadow: [
                         BoxShadow(
