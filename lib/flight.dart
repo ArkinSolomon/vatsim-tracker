@@ -188,7 +188,7 @@ class Flight extends StatelessWidget {
                             child: Align(
                               alignment: Alignment.centerLeft,
                               child: Text(
-                                "Alt: ${pilot.altitude}ft",
+                                "ALT: ${pilot.altitude}ft",
                                 style: dataStyle,
                               ),
                             ),

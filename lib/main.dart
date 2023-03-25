@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vatsim_tracker/airports.dart' as airports;
 import 'package:vatsim_tracker/flight_list.dart';
 import 'package:vatsim_tracker/home_flight.dart';
+import 'package:vatsim_tracker/pilot.dart';
 import 'package:vatsim_tracker/remote.dart';
 import 'dart:math' as math;
 import 'math_utils.dart' show abs, lerp;
@@ -40,7 +41,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late FlightList _list;
-  late HomeFlight _homeFlight;
+  late final HomeFlight _homeFlight;
 
   double _listScrollOffset = 0;
 
@@ -54,17 +55,23 @@ class _HomePageState extends State<HomePage> {
             ? Remote.getPilot(myCID)
             : Remote.getRandomPilot());
 
+    Remote.addUpdateListener(() {
+      Pilot old = _homeFlight.getPilot();
+
+      if (Remote.hasPilot(old.cid)) {
+        _homeFlight.setPilot(Remote.getPilot(old.cid));
+      } else {
+        _homeFlight.setPilot(Remote.getRandomPilot());
+      }
+    });
+
     _list = FlightList(
       onOffsetUpdate: (offset) {
         setState(() {
           _listScrollOffset = offset;
         });
       },
-      onFlightClick: (pilot) {
-        setState(() {
-          _homeFlight = HomeFlight(pilot: pilot);
-        });
-      },
+      onFlightClick: _homeFlight.setPilot,
     );
   }
 

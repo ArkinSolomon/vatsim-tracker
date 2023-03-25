@@ -14,8 +14,10 @@ class Remote {
 
   static final Set<void Function()> _updateListeners = {};
 
-  static void addUpdateListener = _updateListeners.add;
-  static void removeUpdateListener = _updateListeners.remove;
+  static void addUpdateListener(void Function() listener) =>
+      _updateListeners.add(listener);
+  static void removeUpdateListener(void Function() listener) =>
+      _updateListeners.remove(listener);
 
   /// Update the currently data from the Vatsim network.
   ///

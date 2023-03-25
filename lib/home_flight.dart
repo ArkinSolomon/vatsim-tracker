@@ -1,3 +1,5 @@
+import 'package:vatsim_tracker/main.dart';
+
 import 'airports.dart' as airports;
 import 'package:flutter/material.dart';
 import 'package:vatsim_tracker/progress_circle.dart';
@@ -5,8 +7,23 @@ import 'pilot.dart';
 import 'flight.dart' show setMaxLen;
 
 /// The widget displayed on the top of the homepage.
-class HomeFlight extends StatelessWidget {
-  final Pilot pilot;
+class HomeFlight extends StatefulWidget {
+  final _HomeFlightState _state;
+
+  /// Display the fligth status for [pilot].
+  HomeFlight({required pilot, super.key}) : _state = _HomeFlightState(pilot);
+
+  void setPilot(Pilot pilot) => _state.setPilot(pilot);
+  Pilot getPilot() => _state.pilot;
+
+  @override
+  // ignore: no_logic_in_create_state
+  State<StatefulWidget> createState() => _state;
+}
+
+class _HomeFlightState extends State<HomeFlight> {
+  /// The pilot that the homeflight is displaying.
+  Pilot pilot;
 
   static const TextStyle airportTextStyle = TextStyle(
     color: Colors.black,
@@ -20,8 +37,20 @@ class HomeFlight extends StatelessWidget {
     fontFamily: "AzeretMono",
   );
 
-  /// Display the fligth status for [pilot].
-  const HomeFlight({required this.pilot, super.key});
+  static const TextStyle bodyTextStyle = TextStyle(
+    color: Colors.black,
+    fontFamily: "AzeretMono",
+    fontSize: 14,
+  );
+
+  _HomeFlightState(this.pilot);
+
+  /// Update the pilot.
+  void setPilot(Pilot pilot) {
+    setState(() {
+      this.pilot = pilot;
+    });
+  }
 
   /// The widget that's displayed if the pilot has an IFR flight plan.
   Widget ifrFlightWidget(BuildContext context) {
@@ -85,7 +114,7 @@ class HomeFlight extends StatelessWidget {
           ),
           Center(
             child: Container(
-              padding: const EdgeInsets.only(left: 20, right: 20, top: 34),
+              padding: const EdgeInsets.only(left: 20, right: 20, top: 28),
               child: Row(
                 children: [
                   Expanded(
@@ -111,8 +140,91 @@ class HomeFlight extends StatelessWidget {
             ),
           ),
           Container(
-            decoration:
-                BoxDecoration(border: Border.all(color: Colors.pink, width: 1)),
+            padding: const EdgeInsets.only(
+              top: myFlightHeight / 2 + 20,
+              left: 20,
+              right: 20,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        "GS: ${pilot.groundspeed}kts",
+                        style: bodyTextStyle,
+                      ),
+                    ),
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          "HDG: ${pilot.heading}°",
+                          style: bodyTextStyle,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        "ALT: ${pilot.altitude}ft",
+                        style: bodyTextStyle,
+                      ),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            "Lat: ${pilot.latitude}°",
+                            style: bodyTextStyle,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            "Long: ${pilot.longitude}°",
+                            style: bodyTextStyle,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            "Squawk: ${pilot.transponder}",
+                            style: bodyTextStyle,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            "QNH: ${pilot.qnhIHg}inHg",
+                            style: bodyTextStyle,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
           )
         ],
       ),
