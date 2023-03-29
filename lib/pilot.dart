@@ -117,7 +117,7 @@ class Pilot {
         arrival == null ||
         flightPlan!.departure == flightPlan!.arrival ||
         flightPlan!.arrival == "NONE") {
-      return groundspeed > 35 ? FlightStatus.flying : FlightStatus.flying;
+      return groundspeed > 35 ? FlightStatus.flying : FlightStatus.landed;
     }
 
     final departureDist = getDistanceToAirport(departure);

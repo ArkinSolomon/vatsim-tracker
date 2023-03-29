@@ -1,3 +1,4 @@
+import 'package:vatsim_tracker/flight_plan.dart';
 import 'package:vatsim_tracker/main.dart';
 
 import 'airports.dart' as airports;
@@ -35,6 +36,7 @@ class _HomeFlightState extends State<HomeFlight> {
   static const TextStyle headDataTextStyle = TextStyle(
     color: Colors.white,
     fontFamily: "AzeretMono",
+    fontSize: 15,
   );
 
   static const TextStyle bodyTextStyle = TextStyle(
@@ -50,6 +52,30 @@ class _HomeFlightState extends State<HomeFlight> {
     setState(() {
       this.pilot = pilot;
     });
+  }
+
+  /// The text displayed just above the arrival and departure airports regarding
+  /// the pilot's distance flown.
+  String _getFlightDistanceText() {
+    FlightPlan? plan = pilot.flightPlan;
+
+    if (plan == null || plan.arrival == "NONE" || plan.arrival.isEmpty) {
+      return "";
+    }
+
+    final flightPlanDistance = plan.getDistance().round();
+    if (flightPlanDistance < 0) {
+      return "Unknown distance";
+    }
+
+    final arrivalAirport = airports.getAirport(plan.arrival);
+    final pilotDistance = pilot.getDistanceToAirport(arrivalAirport!).round();
+    if (pilot.status == FlightStatus.preflight) {
+      return "Flown 0nm of ${flightPlanDistance}nm";
+    } else if (pilot.status == FlightStatus.arrived) {
+      return "Flown ${flightPlanDistance}nm of ${flightPlanDistance}nm";
+    }
+    return "Flown ${flightPlanDistance - pilotDistance}nm of ${flightPlanDistance}nm";
   }
 
   /// The widget that's displayed if the pilot has an IFR flight plan.
@@ -89,7 +115,7 @@ class _HomeFlightState extends State<HomeFlight> {
           Align(
             alignment: Alignment.topCenter,
             child: Container(
-              padding: const EdgeInsets.only(top: 34),
+              padding: const EdgeInsets.only(top: 30),
               child: Column(
                 children: [
                   Text(pilot.callsign, style: headDataTextStyle),
@@ -107,6 +133,17 @@ class _HomeFlightState extends State<HomeFlight> {
                     padding: const EdgeInsets.only(top: 6),
                     child: Text(setMaxLen(pilot.name, 24),
                         style: headDataTextStyle),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 18),
+                    child: Text(
+                      _getFlightDistanceText(),
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontFamily: "AzeretMono",
+                        fontSize: 15,
+                      ),
+                    ),
                   )
                 ],
               ),

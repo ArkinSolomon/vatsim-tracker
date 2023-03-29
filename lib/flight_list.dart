@@ -108,10 +108,6 @@ class _FlightListState extends State<FlightList>
     _flightChildren = [SizedBox.fromSize(size: const Size.fromHeight(20))];
 
     for (final pilot in Remote.pilots) {
-      if (pilot.flightPlan == null) {
-        continue; // TODO: Handle VFR
-      }
-
       _flightChildren.add(Flight(
         pilot: pilot,
         onClick: widget._onFlightClick,
@@ -241,15 +237,19 @@ class _FlightListState extends State<FlightList>
         children: [
           _refreshDisplay(),
           !_isLoading
-              ? SingleChildScrollView(
+              ? ListView.builder(
                   controller: _scrollController,
-                  clipBehavior: Clip.hardEdge,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Column(
-                      children: _flightChildren,
-                    ),
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  itemCount: Remote.pilots.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Container(
+                      padding: const EdgeInsets.only(bottom: 30),
+                      child: Flight(
+                        pilot: Remote.pilots[index],
+                        onClick: widget._onFlightClick,
+                      ),
+                    );
+                  },
                 )
               : Container()
         ],
