@@ -19,6 +19,13 @@ class Remote {
   static void removeUpdateListener(void Function() listener) =>
       _updateListeners.remove(listener);
 
+  static late DateTime _lastUpdated;
+
+  /// The UTC time of when the data was last fetched from remote.
+  static DateTime get lastUpdated {
+    return _lastUpdated;
+  }
+
   /// Update the currently data from the Vatsim network.
   ///
   /// This function must be called before attempting to retrieve any data from
@@ -93,6 +100,7 @@ class Remote {
       );
     }
 
+    _lastUpdated = DateTime.now().toUtc();
     _notifyListeners();
   }
 

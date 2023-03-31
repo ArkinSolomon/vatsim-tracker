@@ -1,4 +1,8 @@
+import 'dart:async';
+
+import 'package:cron/cron.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:vatsim_tracker/airports.dart' as airports;
 import 'package:vatsim_tracker/flight_list.dart';
 import 'package:vatsim_tracker/home_flight.dart';
@@ -44,6 +48,20 @@ class _HomePageState extends State<HomePage> {
   late final HomeFlight _homeFlight;
 
   double _listScrollOffset = 0;
+  late DateTime _currentTime;
+
+  late int _headTextType = 0;
+
+  final cron = Cron();
+
+  static final _zuluFormat = DateFormat("HHmm");
+  static final _lastUpdatedFormat = DateFormat("HHmm:ss");
+
+  static const TextStyle topText = TextStyle(
+    color: Colors.white,
+    fontFamily: "AzeretMono",
+    fontSize: 12,
+  );
 
   @override
   void initState() {
@@ -73,6 +91,69 @@ class _HomePageState extends State<HomePage> {
       },
       onFlightClick: _homeFlight.setPilot,
     );
+
+    _currentTime = DateTime.now().toUtc();
+
+    _updateHeader();
+    Timer.periodic(const Duration(seconds: 10), (_) {
+      _updateHeader();
+    });
+
+    cron.schedule(Schedule.parse("* * * * *"), () {
+      setState(() {
+        _currentTime = DateTime.now().toUtc();
+      });
+    });
+  }
+
+  void _updateHeader() {
+    int newHeadTextType = 0;
+    if (DateTime.now().second >= 45) {
+      newHeadTextType = 1;
+    } else if (DateTime.now().second >= 30) {
+      newHeadTextType = 0;
+    } else if (DateTime.now().second >= 15) {
+      newHeadTextType = 1;
+    }
+
+    if (newHeadTextType == _headTextType) {
+      return;
+    }
+
+    if (mounted) {
+      setState(() {
+        _headTextType = newHeadTextType;
+      });
+    }
+  }
+
+  /// Get the text that is supposed to be on the left side at the bar on top.
+  String _getHeadTextLeft() {
+    switch (_headTextType) {
+      case 0:
+        return "${Remote.pilots.length} Pilots";
+      case 1:
+        return "${_zuluFormat.format(_currentTime)} ZULU";
+      default:
+
+        // No setState() because we don't want to trigger a rebuild
+        _headTextType = 0;
+        return _getHeadTextLeft();
+    }
+  }
+
+  /// Similar to [_getHeadTextLeft], gets whats supposed ot be on the right side
+  /// on top.
+  String _getHeadTextRight() {
+    switch (_headTextType) {
+      case 0:
+        return "${Remote.pilots.length} Controllers";
+      case 1:
+        return "Updated ${_lastUpdatedFormat.format(Remote.lastUpdated)}";
+      default:
+        _headTextType = 0;
+        return _getHeadTextRight();
+    }
   }
 
   @override
@@ -93,8 +174,55 @@ class _HomePageState extends State<HomePage> {
         ),
         child: Stack(
           children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 46, horizontal: 20),
+              child: SizedBox(
+                height: 12,
+                child: Stack(
+                  children: [
+                    const Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        " | ",
+                        style: topText,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 12),
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                _getHeadTextLeft(),
+                                style: topText,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 12),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                _getHeadTextRight(),
+                                style: topText,
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
             Column(
               children: [
+                // This expanded container sticks the white background to the
+                // bottom
                 Expanded(child: Container()),
                 Container(
                   alignment: Alignment.bottomCenter,

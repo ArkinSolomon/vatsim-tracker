@@ -39,6 +39,8 @@ dependencies:
   shared_preferences: 
   csv: ^5.0.1
   flutter_svg: ^2.0.4
+  intl: ^0.18.0
+  cron: ^0.5.1
 
 dev_dependencies:
   flutter_test:
