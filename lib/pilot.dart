@@ -109,15 +109,20 @@ class Pilot {
   /// The current status of the pilot, depending on their ground speed,
   /// flight plan type, and distance to the arrival and departure airports.
   FlightStatus get status {
+    final FlightStatus noFPLStatus =
+        groundspeed > 35 ? FlightStatus.flying : FlightStatus.landed;
+
+    if (flightPlan == null ||
+        flightPlan!.departure == flightPlan!.arrival ||
+        flightPlan!.arrival == "NONE") {
+      return noFPLStatus;
+    }
+
     final departure = airports.getAirport(flightPlan!.departure);
     final arrival = airports.getAirport(flightPlan!.arrival);
 
-    if (flightPlan == null ||
-        departure == null ||
-        arrival == null ||
-        flightPlan!.departure == flightPlan!.arrival ||
-        flightPlan!.arrival == "NONE") {
-      return groundspeed > 35 ? FlightStatus.flying : FlightStatus.landed;
+    if (departure == null || arrival == null) {
+      return noFPLStatus;
     }
 
     final departureDist = getDistanceToAirport(departure);
@@ -134,5 +139,12 @@ class Pilot {
     }
 
     return FlightStatus.unknown;
+  }
+
+  /// True if the pilot has a filed flightplan.
+  ///
+  /// True iff [flightPlan] is not `null`.
+  bool get hasFlightPlan {
+    return flightPlan != null;
   }
 }

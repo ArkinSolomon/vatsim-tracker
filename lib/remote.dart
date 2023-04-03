@@ -1,8 +1,11 @@
+import 'package:vatsim_tracker/facility.dart';
 import 'package:vatsim_tracker/flight_plan.dart';
 import 'package:vatsim_tracker/pilot.dart';
 import 'package:http/http.dart' as http;
+import 'package:vatsim_tracker/rating.dart';
 import 'dart:convert' as convert;
-import "dart:math" as math;
+import 'dart:math' as math;
+import 'controller.dart';
 
 final _random = math.Random();
 
@@ -11,6 +14,9 @@ final _random = math.Random();
 class Remote {
   /// All of the pilots indexed by their CID.
   static late Map<int, Pilot> _pilots;
+
+  /// All of the controllers indexed by their callsign.
+  static late Map<String, Controller> _controllers;
 
   static final Set<void Function()> _updateListeners = {};
 
@@ -100,13 +106,47 @@ class Remote {
       );
     }
 
+    final allControllers =
+        List<Map<String, dynamic>>.from(parsedData["controllers"]);
+    _controllers = {};
+
+    for (final controllerData in allControllers) {
+      final logonTime =
+          DateTime.tryParse(controllerData["logon_time"]) ?? DateTime(0);
+      final lastUpdated =
+          DateTime.tryParse(controllerData["last_updated"]) ?? DateTime(0);
+
+      final String callsign = controllerData["callsign"];
+
+      _controllers[callsign] = Controller(
+        cid: controllerData["cid"],
+        name: controllerData["name"],
+        callsign: controllerData["callsign"],
+        frequency: controllerData["frequency"],
+        facility: FacilityExt.fromId(controllerData["facility"]),
+        rating: RatingExt.fromId(controllerData["rating"]),
+        server: controllerData["server"],
+        visualRange: controllerData["visual_range"],
+        textAtis: controllerData["text_atis"] == null
+            ? null
+            : List<String>.from(controllerData["text_atis"]),
+        lastUpdated: lastUpdated,
+        logonTime: logonTime,
+      );
+    }
+
     _lastUpdated = DateTime.now().toUtc();
     _notifyListeners();
   }
 
-  /// Get a list of all of the pilots connected to the network.
+  /// Get a list of all the pilots connected to the network.
   static List<Pilot> get pilots {
     return _pilots.values.toList();
+  }
+
+  /// Get a list of all the controllers connected to the network.
+  static List<Controller> get controllers {
+    return _controllers.values.toList();
   }
 
   /// Get a pilot by their [cid].

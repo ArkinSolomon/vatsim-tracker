@@ -81,6 +81,9 @@ class _HomePageState extends State<HomePage> {
       } else {
         _homeFlight.setPilot(Remote.getRandomPilot());
       }
+
+      // Force refresh to update updated time at the top
+      setState(() {});
     });
 
     _list = FlightList(
@@ -147,7 +150,7 @@ class _HomePageState extends State<HomePage> {
   String _getHeadTextRight() {
     switch (_headTextType) {
       case 0:
-        return "${Remote.pilots.length} Controllers";
+        return "${Remote.controllers.length} Controllers";
       case 1:
         return "Updated ${_lastUpdatedFormat.format(Remote.lastUpdated)}";
       default:
