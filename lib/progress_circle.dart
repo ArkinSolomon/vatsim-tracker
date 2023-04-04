@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'main.dart' show myFlightHeight;
+import 'pages/main_page.dart' show myFlightHeight;
 import 'math_utils.dart' show lerp;
 import 'dart:math' as math;
 

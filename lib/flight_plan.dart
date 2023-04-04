@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:vatsim_tracker/airport.dart';
+import 'package:vatsim_tracker/data/airport.dart';
 
-import 'airports.dart' as airports;
+import 'data/airports.dart' as airports;
 
 /// Calculate the distance between two points on the globe using the Haversine
 /// method.

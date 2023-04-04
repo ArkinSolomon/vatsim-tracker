@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:vatsim_tracker/pilot.dart';
-import 'package:vatsim_tracker/remote.dart';
+import 'package:vatsim_tracker/data/pilot.dart';
+import 'package:vatsim_tracker/data/remote.dart';
 import 'dart:math' as math;
 import 'math_utils.dart' show lerp, smoothstep, abs;
 

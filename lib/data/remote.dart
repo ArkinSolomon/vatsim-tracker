@@ -1,8 +1,8 @@
-import 'package:vatsim_tracker/facility.dart';
+import 'package:vatsim_tracker/data/facility.dart';
 import 'package:vatsim_tracker/flight_plan.dart';
-import 'package:vatsim_tracker/pilot.dart';
+import 'package:vatsim_tracker/data/pilot.dart';
 import 'package:http/http.dart' as http;
-import 'package:vatsim_tracker/rating.dart';
+import 'package:vatsim_tracker/data/rating.dart';
 import 'dart:convert' as convert;
 import 'dart:math' as math;
 import 'controller.dart';

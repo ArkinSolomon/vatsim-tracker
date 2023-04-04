@@ -1,4 +1,4 @@
-import 'package:vatsim_tracker/airports.dart' as airports;
+import 'package:vatsim_tracker/data/airports.dart' as airports;
 import 'package:vatsim_tracker/flight_plan.dart'
     show FlightPlan, calculateDistance;
 

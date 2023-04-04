@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:vatsim_tracker/airports.dart' as airports;
+import 'package:vatsim_tracker/data/airports.dart' as airports;
 import 'dart:math' as math;
 import 'flight_plan.dart';
 
-import 'package:vatsim_tracker/pilot.dart';
+import 'package:vatsim_tracker/data/pilot.dart';
 
 /// Add "..." to the end of a string if its too long.
 ///

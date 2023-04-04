@@ -1,10 +1,10 @@
 import 'package:vatsim_tracker/flight_plan.dart';
-import 'package:vatsim_tracker/main.dart';
+import 'package:vatsim_tracker/pages/main_page.dart';
 
-import 'airports.dart' as airports;
+import 'data/airports.dart' as airports;
 import 'package:flutter/material.dart';
 import 'package:vatsim_tracker/progress_circle.dart';
-import 'pilot.dart';
+import 'data/pilot.dart';
 import 'flight.dart' show setMaxLen;
 
 /// The widget displayed on the top of the homepage.
@@ -45,6 +45,12 @@ class _HomeFlightState extends State<HomeFlight> {
     fontSize: 14,
   );
 
+  static const TextStyle unplannedHeadStyle = TextStyle(
+    color: Colors.white,
+    fontFamily: "AzeretMono",
+    fontSize: 35,
+  );
+
   _HomeFlightState(this.pilot);
 
   /// Update the pilot.
@@ -78,8 +84,100 @@ class _HomeFlightState extends State<HomeFlight> {
     return "Flown ${flightPlanDistance - pilotDistance}nm of ${flightPlanDistance}nm";
   }
 
-  /// The widget that's displayed if the pilot has an IFR flight plan.
-  Widget ifrFlightWidget(BuildContext context) {
+  /// The general data that is displayed for a pilot regardless of if they have
+  /// a filed flight plan.
+  Widget _bodyStatistics() {
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: myFlightHeight / 2 + 20,
+        left: 20,
+        right: 20,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  "GS: ${pilot.groundspeed}kts",
+                  style: bodyTextStyle,
+                ),
+              ),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    "HDG: ${pilot.heading}°",
+                    style: bodyTextStyle,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  "ALT: ${pilot.altitude}ft",
+                  style: bodyTextStyle,
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      "Lat: ${pilot.latitude}°",
+                      style: bodyTextStyle,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      "Long: ${pilot.longitude}°",
+                      style: bodyTextStyle,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      "Squawk: ${pilot.transponder}",
+                      style: bodyTextStyle,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      "QNH: ${pilot.qnhIHg}inHg",
+                      style: bodyTextStyle,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  /// The widget that's displayed if the pilot has a flight plan.
+  Widget _plannedFlightWidget(BuildContext context) {
     final flightPlan = pilot.flightPlan!;
 
     double progress;
@@ -104,7 +202,7 @@ class _HomeFlightState extends State<HomeFlight> {
       }
     }
 
-    return Container(
+    return Padding(
       padding: const EdgeInsets.only(top: 65),
       child: Stack(
         children: [
@@ -176,93 +274,47 @@ class _HomeFlightState extends State<HomeFlight> {
               ),
             ),
           ),
-          Container(
-            padding: const EdgeInsets.only(
-              top: myFlightHeight / 2 + 20,
-              left: 20,
-              right: 20,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        "GS: ${pilot.groundspeed}kts",
-                        style: bodyTextStyle,
-                      ),
-                    ),
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          "HDG: ${pilot.heading}°",
-                          style: bodyTextStyle,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        "ALT: ${pilot.altitude}ft",
-                        style: bodyTextStyle,
-                      ),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            "Lat: ${pilot.latitude}°",
-                            style: bodyTextStyle,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            "Long: ${pilot.longitude}°",
-                            style: bodyTextStyle,
-                          ),
-                        ),
-                      ),
-                    ],
+          _bodyStatistics()
+        ],
+      ),
+    );
+  }
+
+  /// The widget that's displayed if the pilot does not have a fligth plan.
+  Widget _unplannedFlightWidget() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 65),
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: myFlightHeight / 10),
+            child: Center(
+              child: Column(
+                children: [
+                  Text(
+                    pilot.callsign,
+                    style: unplannedHeadStyle,
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            "Squawk: ${pilot.transponder}",
-                            style: bodyTextStyle,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            "QNH: ${pilot.qnhIHg}inHg",
-                            style: bodyTextStyle,
-                          ),
-                        ),
-                      ),
-                    ],
+                  Text(
+                    pilot.name,
+                    style: headDataTextStyle,
                   ),
-                )
-              ],
+                  const SizedBox(
+                    height: 60,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 30),
+                    child: Text(
+                      "This pilot has not filed a flight plan for this flight.",
+                      style: bodyTextStyle,
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                ],
+              ),
             ),
-          )
+          ),
+          _bodyStatistics()
         ],
       ),
     );
@@ -270,9 +322,9 @@ class _HomeFlightState extends State<HomeFlight> {
 
   @override
   Widget build(BuildContext context) {
-    if (pilot.flightPlan == null) {
-      return const Text("TEXT");
+    if (pilot.hasFlightPlan) {
+      return _plannedFlightWidget(context);
     }
-    return ifrFlightWidget(context);
+    return _unplannedFlightWidget();
   }
 }

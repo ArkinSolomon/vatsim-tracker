@@ -1,5 +1,5 @@
-import 'package:vatsim_tracker/facility.dart';
-import 'package:vatsim_tracker/rating.dart';
+import 'package:vatsim_tracker/data/facility.dart';
+import 'package:vatsim_tracker/data/rating.dart';
 
 class Controller {
   const Controller({
