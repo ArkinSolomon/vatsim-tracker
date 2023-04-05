@@ -49,10 +49,11 @@ class _MainPageState extends State<MainPage> {
     super.initState();
 
     const int myCID = 1404350;
-    _homeFlight = HomeFlight(
-        pilot: Remote.hasPilot(myCID)
-            ? Remote.getPilot(myCID)
-            : Remote.getRandomPilot());
+    if (Remote.hasPilot(myCID)) {
+      _homeFlight = HomeFlight(pilot: Remote.getPilot(myCID));
+    } else {
+      _homeFlight = HomeFlight(pilot: Remote.getRandomPilot());
+    }
 
     Remote.addUpdateListener(() {
       Pilot old = _homeFlight.getPilot();
@@ -140,9 +141,23 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
+  double _getAllFlightLabelHeight() {
+    const double initialHeight = 28;
+    const double finalHeight = 22;
+    const double requiedOffset = 250;
+    if (_listScrollOffset <= 0) {
+      return initialHeight;
+    } else if (_listScrollOffset >= requiedOffset) {
+      return finalHeight;
+    }
+    return ((finalHeight - initialHeight) / requiedOffset) * _listScrollOffset +
+        initialHeight;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
+      // alignment: Alignment.topCenter,
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 46, horizontal: 20),
@@ -216,6 +231,22 @@ class _MainPageState extends State<MainPage> {
         SizedBox(
           height: myFlightHeight,
           child: _homeFlight,
+        ),
+        Positioned(
+          top: myFlightHeight - _getAllFlightLabelHeight() * 1.5,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 20),
+            child: Text(
+              "All flights:",
+              style: TextStyle(
+                color: Colors.black,
+                fontFamily: "AzeretMono",
+                fontSize: _getAllFlightLabelHeight(), // scale with list offset
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
         ),
 
         // The shadow that appears after yous tart scrolling

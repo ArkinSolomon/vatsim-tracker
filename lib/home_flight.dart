@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:vatsim_tracker/progress_circle.dart';
 import 'data/pilot.dart';
 import 'flight.dart' show setMaxLen;
+import 'math_utils.dart' show abs;
 
 /// The widget displayed on the top of the homepage.
 class HomeFlight extends StatefulWidget {
@@ -81,7 +82,7 @@ class _HomeFlightState extends State<HomeFlight> {
     } else if (pilot.status == FlightStatus.arrived) {
       return "Flown ${flightPlanDistance}nm of ${flightPlanDistance}nm";
     }
-    return "Flown ${flightPlanDistance - pilotDistance}nm of ${flightPlanDistance}nm";
+    return "Flown ${abs(flightPlanDistance - pilotDistance)}nm of ${flightPlanDistance}nm";
   }
 
   /// The general data that is displayed for a pilot regardless of if they have
