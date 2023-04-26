@@ -18,7 +18,7 @@ const double myFlightHeight = 400;
 
 /// The application's home page.
 class MainPage extends Page {
-  const MainPage({required super.manager, super.key});
+  const MainPage({super.key});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -55,18 +55,7 @@ class _MainPageState extends State<MainPage> {
       _homeFlight = HomeFlight(pilot: Remote.getRandomPilot());
     }
 
-    Remote.addUpdateListener(() {
-      Pilot old = _homeFlight.getPilot();
-
-      if (Remote.hasPilot(old.cid)) {
-        _homeFlight.setPilot(Remote.getPilot(old.cid));
-      } else {
-        _homeFlight.setPilot(Remote.getRandomPilot());
-      }
-
-      // Force refresh to update updated time at the top
-      setState(() {});
-    });
+    Remote.addUpdateListener(_updateHomeFlight);
 
     _list = FlightList(
       onOffsetUpdate: (offset) {
@@ -91,6 +80,26 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
+  @override
+  void dispose() {
+    Remote.removeUpdateListener(_updateHomeFlight);
+
+    super.dispose();
+  }
+
+  void _updateHomeFlight() {
+    Pilot old = _homeFlight.getPilot();
+
+    if (Remote.hasPilot(old.cid)) {
+      _homeFlight.setPilot(Remote.getPilot(old.cid));
+    } else {
+      _homeFlight.setPilot(Remote.getRandomPilot());
+    }
+
+    // Force refresh to update updated time at the top
+    setState(() {});
+  }
+
   void _updateHeader() {
     int newHeadTextType = 0;
     if (DateTime.now().second >= 45) {
@@ -109,7 +118,8 @@ class _MainPageState extends State<MainPage> {
       setState(() {
         _headTextType = newHeadTextType;
       });
-    }
+    } else
+      _headTextType = newHeadTextType;
   }
 
   /// Get the text that is supposed to be on the left side at the bar on top.
@@ -141,10 +151,12 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
+  /// Scale the height of the header based on how much the list has scrolled.
   double _getAllFlightLabelHeight() {
     const double initialHeight = 28;
     const double finalHeight = 22;
     const double requiedOffset = 250;
+
     if (_listScrollOffset <= 0) {
       return initialHeight;
     } else if (_listScrollOffset >= requiedOffset) {
@@ -156,129 +168,137 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      // alignment: Alignment.topCenter,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 46, horizontal: 20),
-          child: SizedBox(
-            height: 12,
-            child: Stack(
-              children: [
-                const Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    " | ",
-                    style: topText,
+    return SafeArea(
+      bottom: false,
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: SizedBox(
+              height: 12,
+              child: Stack(
+                children: [
+                  const Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      " | ",
+                      style: topText,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 12),
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              _getHeadTextLeft(),
+                              style: topText,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 12),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              _getHeadTextRight(),
+                              style: topText,
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ),
+          Column(
+            children: [
+              // This expanded container sticks the white background to the
+              // bottom
+              Expanded(child: Container()),
+              Container(
+                alignment: Alignment.bottomCenter,
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
+                ),
+                height: MediaQuery.of(context).size.height -
+                    myFlightHeight * (43 / 90),
+              ),
+            ],
+          ),
+          Container(
+            alignment: Alignment.bottomCenter,
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height -
+                  myFlightHeight -
+                  MediaQuery.of(context).padding.top,
+              child: _list,
+            ),
+          ),
+          SizedBox(
+            height: myFlightHeight,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 25),
+              child: _homeFlight,
+            ),
+          ),
+          Positioned(
+            top: myFlightHeight - _getAllFlightLabelHeight() * 1.5,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                "All flights:",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontFamily: "AzeretMono",
+                  fontSize:
+                      _getAllFlightLabelHeight(), // scale with list offset
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+
+          // The shadow that appears after you start scrolling
+          Positioned(
+            top: myFlightHeight,
+            child: ClipRect(
+              child: Transform.rotate(
+                angle: math.pi,
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: lerp(
+                      0,
+                      30,
+                      // Get the absolute value of the offset
+                      abs(_listScrollOffset) / 30),
+                  decoration: const BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black54,
+                        blurRadius: 10.0,
+                        offset: Offset(
+                          0,
+                          15,
+                        ),
+                      )
+                    ],
                   ),
                 ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 12),
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            _getHeadTextLeft(),
-                            style: topText,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 12),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            _getHeadTextRight(),
-                            style: topText,
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                )
-              ],
-            ),
-          ),
-        ),
-        Column(
-          children: [
-            // This expanded container sticks the white background to the
-            // bottom
-            Expanded(child: Container()),
-            Container(
-              alignment: Alignment.bottomCenter,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
-              ),
-              height: MediaQuery.of(context).size.height -
-                  myFlightHeight * (43 / 90),
-            ),
-          ],
-        ),
-        Container(
-          alignment: Alignment.bottomCenter,
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height - myFlightHeight,
-            child: _list,
-          ),
-        ),
-        SizedBox(
-          height: myFlightHeight,
-          child: _homeFlight,
-        ),
-        Positioned(
-          top: myFlightHeight - _getAllFlightLabelHeight() * 1.5,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 20),
-            child: Text(
-              "All flights:",
-              style: TextStyle(
-                color: Colors.black,
-                fontFamily: "AzeretMono",
-                fontSize: _getAllFlightLabelHeight(), // scale with list offset
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-
-        // The shadow that appears after yous tart scrolling
-        Positioned(
-          top: myFlightHeight,
-          child: ClipRect(
-            child: Transform.rotate(
-              angle: math.pi,
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: lerp(
-                    0,
-                    30,
-                    // Get the absolute value of the offset
-                    abs(_listScrollOffset) / 30),
-                decoration: const BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black54,
-                      blurRadius: 10.0,
-                      offset: Offset(
-                        0,
-                        15,
-                      ),
-                    )
-                  ],
-                ),
               ),
             ),
-          ),
-        )
-      ],
+          )
+        ],
+      ),
     );
   }
 }

@@ -41,6 +41,7 @@ dependencies:
   flutter_svg: ^2.0.4
   intl: ^0.18.0
   cron: ^0.5.1
+  tuple: ^2.0.1
 
 dev_dependencies:
   flutter_test:

@@ -1,12 +1,15 @@
 import 'package:vatsim_tracker/flight_plan.dart';
+import 'package:vatsim_tracker/gradient_button.dart';
 import 'package:vatsim_tracker/pages/main_page.dart';
 
 import 'data/airports.dart' as airports;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Page;
 import 'package:vatsim_tracker/progress_circle.dart';
 import 'data/pilot.dart';
 import 'flight.dart' show setMaxLen;
 import 'math_utils.dart' show abs;
+import 'dart:math' as math;
+import 'pages/page.dart';
 
 /// The widget displayed on the top of the homepage.
 class HomeFlight extends StatefulWidget {
@@ -85,12 +88,130 @@ class _HomeFlightState extends State<HomeFlight> {
     return "Flown ${abs(flightPlanDistance - pilotDistance)}nm of ${flightPlanDistance}nm";
   }
 
+  Widget _moreButton() {
+    return GradientButton(
+      width: 110,
+      height: 40,
+      borderRadius: BorderRadius.circular(8),
+      onPressed: () => Page.setPage(ActivePage.more, data: pilot),
+      gradient: const LinearGradient(
+        begin: Alignment(-0.3, -2.2),
+        end: Alignment(0, -0.4),
+        colors: [
+          Color.fromARGB(255, 74, 7, 61),
+          Color.fromARGB(255, 54, 15, 83),
+        ],
+        transform: GradientRotation(math.pi / 2),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(
+            Icons.map_outlined,
+            color: Colors.white,
+            size: 25,
+          ),
+          SizedBox(
+            width: 6,
+          ),
+          Text(
+            "More",
+            style: TextStyle(
+              fontFamily: "AzeretMono",
+              color: Colors.white,
+              fontWeight: FontWeight.w800,
+              fontSize: 17,
+            ),
+          ),
+        ],
+      ),
+    );
+    return GestureDetector(
+      onTap: () => print("MORE BUTTON"),
+      child: Container(
+        width: 100,
+        height: 36,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          gradient: const LinearGradient(
+            begin: Alignment(-0.3, -2.2),
+            end: Alignment(0, -0.4),
+            colors: [
+              Color.fromARGB(255, 74, 7, 61),
+              Color.fromARGB(255, 54, 15, 83),
+            ],
+            transform: GradientRotation(math.pi / 2),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Icon(
+              Icons.map_outlined,
+              color: Colors.white,
+              size: 25,
+            ),
+            SizedBox(
+              width: 6,
+            ),
+            Text(
+              "More",
+              style: TextStyle(
+                fontFamily: "AzeretMono",
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+                fontSize: 17,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        gradient: const LinearGradient(
+          begin: Alignment(-0.3, -2.2),
+          end: Alignment(0, -0.4),
+          colors: [
+            Color.fromARGB(255, 74, 7, 61),
+            Color.fromARGB(255, 54, 15, 83),
+          ],
+          transform: GradientRotation(math.pi / 2),
+        ),
+      ),
+      child: ElevatedButton.icon(
+        icon: const Icon(
+          Icons.map_outlined,
+          color: Colors.white,
+          size: 25,
+        ),
+        onPressed: () => print("MORE"),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          splashFactory: NoSplash.splashFactory,
+        ),
+        label: const Text(
+          "More",
+          style: TextStyle(
+            fontFamily: "AzeretMono",
+            color: Colors.white,
+            fontWeight: FontWeight.w800,
+            fontSize: 17,
+          ),
+        ),
+      ),
+    );
+  }
+
   /// The general data that is displayed for a pilot regardless of if they have
   /// a filed flight plan.
-  Widget _bodyStatistics() {
+  Widget _bodyStatistics(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
-        top: myFlightHeight / 2 + 20,
+        top: myFlightHeight / 2 + 55,
         left: 20,
         right: 20,
       ),
@@ -203,121 +324,118 @@ class _HomeFlightState extends State<HomeFlight> {
       }
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 65),
-      child: Stack(
-        children: [
-          ProgressCircle(
-            progress: progress,
-            padding: 100,
+    return Stack(
+      children: [
+        ProgressCircle(
+          progress: progress,
+          padding: 100,
+        ),
+        Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            padding: const EdgeInsets.only(top: 20),
+            child: Column(
+              children: [
+                Text(pilot.callsign, style: headDataTextStyle),
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child:
+                      Text(flightPlan.aircraftShort, style: headDataTextStyle),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text("Status: ${pilot.status.readable}",
+                      style: headDataTextStyle),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child:
+                      Text(setMaxLen(pilot.name, 24), style: headDataTextStyle),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 18),
+                  child: Text(
+                    _getFlightDistanceText(),
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontFamily: "AzeretMono",
+                      fontSize: 15,
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
-          Align(
-            alignment: Alignment.topCenter,
-            child: Container(
-              padding: const EdgeInsets.only(top: 30),
-              child: Column(
-                children: [
-                  Text(pilot.callsign, style: headDataTextStyle),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 6),
-                    child: Text(flightPlan.aircraftShort,
-                        style: headDataTextStyle),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 6),
-                    child: Text("Status: ${pilot.status.readable}",
-                        style: headDataTextStyle),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 6),
-                    child: Text(setMaxLen(pilot.name, 24),
-                        style: headDataTextStyle),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 18),
+        ),
+        Center(
+          child: Container(
+            padding: const EdgeInsets.only(left: 20, right: 20),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
                     child: Text(
-                      _getFlightDistanceText(),
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontFamily: "AzeretMono",
-                        fontSize: 15,
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-          Center(
-            child: Container(
-              padding: const EdgeInsets.only(left: 20, right: 20, top: 28),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        flightPlan.departure,
-                        style: airportTextStyle,
-                      ),
+                      flightPlan.departure,
+                      style: airportTextStyle,
                     ),
                   ),
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        flightPlan.arrival,
-                        style: airportTextStyle,
-                      ),
+                ),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      flightPlan.arrival,
+                      style: airportTextStyle,
                     ),
-                  )
-                ],
-              ),
+                  ),
+                )
+              ],
             ),
           ),
-          _bodyStatistics()
-        ],
-      ),
+        ),
+        Align(
+          child: _moreButton(),
+        ),
+        _bodyStatistics(context)
+      ],
     );
   }
 
   /// The widget that's displayed if the pilot does not have a fligth plan.
   Widget _unplannedFlightWidget() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 65),
-      child: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: myFlightHeight / 10),
-            child: Center(
-              child: Column(
-                children: [
-                  Text(
-                    pilot.callsign,
-                    style: unplannedHeadStyle,
+    return Stack(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: myFlightHeight / 10),
+          child: Center(
+            child: Column(
+              children: [
+                Text(
+                  pilot.callsign,
+                  style: unplannedHeadStyle,
+                ),
+                Text(
+                  pilot.name,
+                  style: headDataTextStyle,
+                ),
+                const SizedBox(
+                  height: 60,
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 30),
+                  child: Text(
+                    "This pilot has not filed a flight plan for this flight.",
+                    style: bodyTextStyle,
+                    textAlign: TextAlign.center,
                   ),
-                  Text(
-                    pilot.name,
-                    style: headDataTextStyle,
-                  ),
-                  const SizedBox(
-                    height: 60,
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 30),
-                    child: Text(
-                      "This pilot has not filed a flight plan for this flight.",
-                      style: bodyTextStyle,
-                      textAlign: TextAlign.center,
-                    ),
-                  )
-                ],
-              ),
+                )
+              ],
             ),
           ),
-          _bodyStatistics()
-        ],
-      ),
+        ),
+        _bodyStatistics(context)
+      ],
     );
   }
 
