@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cron/cron.dart';
 import 'package:flutter/material.dart' hide Page;
 import 'package:intl/intl.dart';
+import 'package:vatsim_tracker/pages/page_background_tab.dart';
 
 import 'dart:math' as math;
 import '../math_utils.dart' show abs, lerp;
@@ -118,8 +119,9 @@ class _MainPageState extends State<MainPage> {
       setState(() {
         _headTextType = newHeadTextType;
       });
-    } else
+    } else {
       _headTextType = newHeadTextType;
+    }
   }
 
   /// Get the text that is supposed to be on the left side at the bar on top.
@@ -217,23 +219,7 @@ class _MainPageState extends State<MainPage> {
               ),
             ),
           ),
-          Column(
-            children: [
-              // This expanded container sticks the white background to the
-              // bottom
-              Expanded(child: Container()),
-              Container(
-                alignment: Alignment.bottomCenter,
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
-                ),
-                height: MediaQuery.of(context).size.height -
-                    myFlightHeight * (43 / 90),
-              ),
-            ],
-          ),
+          const PageBackgroundTab(height: myFlightHeight * (43 / 90)),
           Container(
             alignment: Alignment.bottomCenter,
             child: SizedBox(

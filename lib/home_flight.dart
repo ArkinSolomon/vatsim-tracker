@@ -1,12 +1,12 @@
 import 'package:vatsim_tracker/flight_plan.dart';
 import 'package:vatsim_tracker/gradient_button.dart';
 import 'package:vatsim_tracker/pages/main_page.dart';
+import 'package:vatsim_tracker/string_utils.dart';
 
 import 'data/airports.dart' as airports;
 import 'package:flutter/material.dart' hide Page;
 import 'package:vatsim_tracker/progress_circle.dart';
 import 'data/pilot.dart';
-import 'flight.dart' show setMaxLen;
 import 'math_utils.dart' show abs;
 import 'dart:math' as math;
 import 'pages/page.dart';

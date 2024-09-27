@@ -2,10 +2,12 @@ import 'package:flutter/material.dart' hide Page;
 import 'package:tuple/tuple.dart';
 import 'package:vatsim_tracker/data/airports.dart' as airports;
 import 'package:vatsim_tracker/data/remote.dart';
+import 'package:vatsim_tracker/drawer_button.dart';
 import 'package:vatsim_tracker/pages/page.dart';
-import 'package:vatsim_tracker/pages/main_page.dart';
 
 import 'dart:math' as math;
+
+import 'app_drawer.dart';
 
 /// Initialization code.
 void main() async {
@@ -61,6 +63,7 @@ class PageManagerState extends State<PageManager> {
 
     return Scaffold(
       key: scaffoldKey,
+      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -89,17 +92,7 @@ class PageManagerState extends State<PageManager> {
           ],
         ),
       ),
-      drawer: Drawer(
-          child: Column(
-        children: const [
-          Text("HELLO"),
-          Text("HELLO"),
-          Text("HELLO"),
-          Text("HELLO"),
-          Text("HELLO"),
-          Text("HELLO")
-        ],
-      )),
+      drawer: AppDrawer(),
     );
   }
 }

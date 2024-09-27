@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart' hide Page;
 import 'package:tuple/tuple.dart';
 import 'package:vatsim_tracker/flight.dart';
+import 'package:vatsim_tracker/flight_map.dart';
 import 'package:vatsim_tracker/pages/page.dart';
+import 'package:vatsim_tracker/pages/page_background_tab.dart';
 
 import '../data/pilot.dart';
 
@@ -32,32 +34,26 @@ class _MorePageState extends State<MorePage> {
       bottom: false,
       child: Stack(
         children: [
+          const PageBackgroundTab(height: 400 * (43 / 90)),
           Column(
             children: [
-              // This expanded container sticks the white background to the
-              // bottom
-              Expanded(child: Container()),
-              Container(
-                alignment: Alignment.bottomCenter,
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(35)),
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 10,
+                  right: 10,
+                  top: 50,
                 ),
-                height: MediaQuery.of(context).size.height - 400 * (43 / 90),
+                child: Flight(
+                  pilot: widget.pilot,
+                  onClick: (_) {},
+                ),
               ),
+              Container(
+                padding: const EdgeInsets.only(top: 15, left: 10, right: 10),
+                height: 230,
+                child: FlightMap(widget.pilot),
+              )
             ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 10,
-              right: 10,
-              top: 50,
-            ),
-            child: Flight(
-              pilot: widget.pilot,
-              onClick: (_) {},
-            ),
           ),
         ],
       ),

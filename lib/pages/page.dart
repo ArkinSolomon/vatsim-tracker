@@ -3,12 +3,14 @@ import 'package:tuple/tuple.dart';
 import 'package:vatsim_tracker/data/pilot.dart';
 import 'package:vatsim_tracker/pages/main_page.dart';
 import 'package:vatsim_tracker/pages/more_page.dart';
+import 'package:vatsim_tracker/pages/settings_page.dart';
 
 import '../main.dart';
 
 enum ActivePage {
   main,
   more,
+  settings,
 }
 
 /// A base class for all pages to inherit from to allow easy page switching.
@@ -34,6 +36,10 @@ abstract class Page extends StatefulWidget {
         break;
       case ActivePage.more:
         manager.setPage(page, MorePage(data as Pilot));
+        break;
+      case ActivePage.settings:
+        manager.setPage(page, const SettingsPage());
+        break;
     }
   }
 
